@@ -2,7 +2,7 @@ package j;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+//925 11
 public class SynchronizedClass implements Runnable{
     private int i ;
     private volatile double d;
