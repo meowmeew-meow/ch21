@@ -1,10 +1,9 @@
 package j;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 //941 15
 public class CriticalSections{
+    private Object syncObject=new Object();
+    private Object syncObject2 = new Object();
     int i;
     public void f(){
         synchronized (this) {
@@ -15,7 +14,7 @@ public class CriticalSections{
         }
     }
     public void g(){
-        synchronized (this){
+        synchronized (syncObject){
             i--;
             for (int j = 0; j < 5; j++) {
                 System.out.println(i);
@@ -23,7 +22,7 @@ public class CriticalSections{
         }
     }
     public void t(){
-        synchronized (this){
+        synchronized (syncObject2){
             i+=10;
             for (int j = 0; j < 5; j++) {
                 System.out.println(i);
