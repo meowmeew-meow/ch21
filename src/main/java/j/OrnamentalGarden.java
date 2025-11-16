@@ -40,15 +40,19 @@ class Entrance implements Runnable {
 
     public void run() {
         while (!Thread.interrupted()) {
-            synchronized (this) {
-                ++number;
-            }
-            System.out.println(this + " Total: " + count.increment());
             try {
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
+                synchronized (this) {
+                    ++number;
+                }
+                System.out.println(this + " Total: " + count.increment());
+                try {
+                    TimeUnit.MILLISECONDS.sleep(100);
+                } catch (InterruptedException e) {
 
-                System.out.println("sleep interrupted");
+                    System.out.println("sleep interrupted");
+                }
+            }finally {
+                cancel();
             }
         }
         System.out.println("Stopping" + this);
