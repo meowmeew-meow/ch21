@@ -3,7 +3,7 @@ package j;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-//968 25
+//968 25 26
 class Meal {
     private final int orderNum;
 
@@ -34,6 +34,10 @@ class WaitPerson implements Runnable {
                 synchronized (restaurant.chef) {
                     restaurant.meal = null;
                     restaurant.chef.notifyAll(); // Готово для следующего блюда
+                }
+                synchronized (restaurant.busBoy){
+                    restaurant.delivered=true;
+                    restaurant.busBoy.notifyAll();
                 }
             }
         } catch (InterruptedException e) {
@@ -74,16 +78,40 @@ class Chef implements Runnable {
         }
     }
 }
+class BusBoy implements Runnable{
+    private Restaurant restaurant;
+    public BusBoy(Restaurant r){
+        restaurant=r;
+    }
+    public void run(){
+        try {
+            while (!Thread.interrupted()) {
+                synchronized (this){
+                    while(restaurant.delivered==false){
+                        wait();
+                    }
+                }
+                restaurant.delivered=false;
+                System.out.println("Wash the dish");
+            }
+        }catch (InterruptedException e){
+            System.out.println("BusBoy interrupted");
+        }
+    }
+}
 
 public class Restaurant {
+    boolean delivered;
     Meal meal;
     ExecutorService exec = Executors.newCachedThreadPool();
     WaitPerson waitPerson = new WaitPerson(this);
     Chef chef = new Chef(this);
+    BusBoy busBoy = new BusBoy(this);
 
     public Restaurant() {
         exec.execute(chef);
         exec.execute(waitPerson);
+        exec.execute(busBoy);
     }
 
     public static void main(String[] args) {
